@@ -44,9 +44,9 @@ echo "(*) Installing Gcloud CLI..."
 echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 
-if [ "${1:-latest}" != "latest" ]; then
-    echo "Installing Gcloud ${1}..."
-    apt-get -y install google-cloud-cli="${1}"
+if [ "${_BUILD_ARG_GCLOUD_VERSION}" != "latest" ]; then
+    echo "Installing Gcloud ${_BUILD_ARG_GCLOUD_VERSION}..."
+    apt-get -y install google-cloud-cli="${_BUILD_ARG_GCLOUD_VERSION}"
 else
     echo "Installing latest Gcloud..."
     apt-get update && sudo apt-get install -y google-cloud-cli

@@ -22,7 +22,6 @@
 	"remoteUser": "vscode",
 	"features": {
 		"git": "os-provided",
-		"pomdtr/dev-container-gcloud-feature/gcloud@v0.0.4": "latest",
 		"github-cli": "latest"
 	}
 }
