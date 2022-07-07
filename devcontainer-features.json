@@ -1,30 +1,47 @@
 {
     "features": [
         {
-            "id": "helloworld",
-            "name": "My First Feature",
+            "id": "gcloud",
+            "name": "Google Cloud Cli",
+            "documentationUrl": "https://cloud.google.com/sdk/gcloud/",
             "options": {
-                "greeting": {
+                "version": {
                     "type": "string",
-                    "proposals": [ "hey", "hello", "hi", "howdy" ],
-                    "default": "hey",
-                    "description": "Select a pre-made greeting, or enter your own"
+                    "proposals": [
+                        "latest"
+                    ],
+                    "default": "latest",
+                    "description": "Select or enter a google-cloud-cli CLI version. The ten most recent releases are always available in the repo.",
                 }
             },
-            "include": ["ubuntu"]
-        },
-        {
-            "id": "color",
-            "name": "A feature to remind you of your favorite color",
-            "options": {
-                "favorite": {
-                    "type": "string",
-                    "enum": [ "red", "gold", "green" ],
-                    "default": "red",
-                    "description": "Choose your favorite color."
-                }
-            },
-            "include": ["ubuntu"]
+            "include": [
+                "cpp",
+                "dotnet",
+                "dotnet-fsharp",
+                "dotnet-mssql",
+                "kubernetes-helm",
+                "kubernetes-helm-minikube",
+                "docker-from-docker",
+                "docker-in-docker",
+                "powershell",
+                "java",
+                "go",
+                "php",
+                "ruby",
+                "rust",
+                "typescript-node",
+                "javascript-node",
+                "python-3",
+                "python-3-anaconda",
+                "python-3-miniconda",
+                "ubuntu",
+                "debian",
+                "javascript-node-mongo",
+                "javascript-node-postgres",
+                "php-mariadb",
+                "ruby-rails-postgres",
+                "python-3-postgres"
+            ]
         }
     ]
 }

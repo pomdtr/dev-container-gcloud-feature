@@ -1,65 +1,55 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
-# The install.sh script is the installation entrypoint for any dev container 'features' in this repository. 
+# The install.sh script is the installation entrypoint for any dev container 'features' in this repository.
 #
-# The tooling will parse the devcontainer-features.json + user devcontainer, and write 
+# The tooling will parse the devcontainer-features.json + user devcontainer, and write
 # any build-time arguments into a feature-set scoped "devcontainer-features.env"
 # The author is free to source that file and use it however they would like.
 set -a
 . ./devcontainer-features.env
 set +a
 
-
-if [ ! -z ${_BUILD_ARG_HELLOWORLD} ]; then
-    echo "Activating feature 'helloworld'"
-
-    # Build args are exposed to this entire feature set following the pattern:  _BUILD_ARG_<FEATURE ID>_<OPTION NAME>
-    GREETING=${_BUILD_ARG_HELLOWORLD_GREETING:-undefined}
-
-    tee /usr/hello.sh > /dev/null \
-    << EOF
-    #!/bin/bash
-    RED='\033[0;91m'
-    NC='\033[0m' # No Color
-    echo -e "\${RED}${GREETING}, \$(whoami)!"
-    echo -e "\${NC}"
-EOF
-
-    chmod +x /usr/hello.sh
-    sudo cat '/usr/hello.sh' > /usr/local/bin/hello
-    sudo chmod +x /usr/local/bin/hello
+if [ "$(id -u)" -ne 0 ]; then
+    echo -e 'Script must be run as root. Use sudo, su, or add "USER root" to your Dockerfile before running this script.'
+    exit 1
 fi
 
-
-if [ ! -z ${_BUILD_ARG_COLOR} ]; then
-    echo "Activating feature 'color'"
-
-    # Build args are exposed to this entire feature set following the pattern:  _BUILD_ARG_<FEATURE ID>_<OPTION NAME>
-
-    if [ "${_BUILD_ARG_COLOR_FAVORITE}" == "red" ]; then
-        FAVORITE='\\033[0\;91m'
+# Function to run apt-get if needed
+apt_get_update_if_needed()
+{
+    if [ ! -d "/var/lib/apt/lists" ] || [ "$(ls /var/lib/apt/lists/ | wc -l)" = "0" ]; then
+        echo "Running apt-get update..."
+        apt-get update
+    else
+        echo "Skipping apt-get update."
     fi
+}
 
-    if [ "${_BUILD_ARG_COLOR_FAVORITE}" == "green" ]; then
-        FAVORITE='\\033[0\;32m'
+# Checks if packages are installed and installs them if not
+check_packages() {
+    if ! dpkg -s "$@" > /dev/null 2>&1; then
+        apt_get_update_if_needed
+        apt-get -y install --no-install-recommends "$@"
     fi
+}
 
-    if [ "${_BUILD_ARG_COLOR_FAVORITE}" == "gold" ]; then
-        FAVORITE='\\033[0\;33m'
-    fi
+export DEBIAN_FRONTEND=noninteractive
+check_packages apt-transport-https ca-certificates gnupg
 
-    tee /usr/color.sh > /dev/null \
-    << EOF
-    #!/bin/bash
-    NC='\033[0m' # No Color
+echo "(*) Installing Gcloud CLI..."
 
-    FAVORITE=${FAVORITE}
-    echo -e "\${FAVORITE} This is my favorite color! \${NC}"
-EOF
+# install
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 
-    chmod +x /usr/color.sh
-    sudo cat '/usr/color.sh' > /usr/local/bin/color
-    sudo chmod +x /usr/local/bin/color
-
+if [ "${_BUILD_ARG_GCLOUD_VERSION}" != "latest" ]; then
+    echo "Installing Gcloud ${_BUILD_ARG_GCLOUD_VERSION}..."
+    apt-get -y install google-cloud-cli="${_BUILD_ARG_GCLOUD_VERSION}"
+else
+    echo "Installing latest Gcloud..."
+    apt-get update && sudo apt-get install -y google-cloud-cli
 fi
+
+echo "Done!"
