@@ -12,6 +12,7 @@ set -a
 . ./devcontainer-features.env
 set +a
 
-curl https://sdk.cloud.google.com | bash
+curl https://sdk.cloud.google.com > install.sh
+bash install.sh --disable-prompts
 
 echo "Done!"
