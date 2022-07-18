@@ -4,16 +4,6 @@
             "id": "gcloud",
             "name": "Google Cloud Cli",
             "documentationUrl": "https://cloud.google.com/sdk/gcloud/",
-            "options": {
-                "version": {
-                    "type": "string",
-                    "proposals": [
-                        "latest"
-                    ],
-                    "default": "latest",
-                    "description": "Select or enter a google-cloud-cli CLI version. The ten most recent releases are always available in the repo.",
-                }
-            },
             "include": [
                 "cpp",
                 "dotnet",
